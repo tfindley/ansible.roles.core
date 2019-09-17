@@ -1,0 +1,9 @@
+# tasks file for core::apt_install
+
+- name: Install a list of Ansibe-required packages
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - python-apt
+    - libcurl3

@@ -1,0 +1,38 @@
+---
+# tasks file for core::ssh
+
+- name: SSH Service - Install, Configure, Restart (DEB)
+  block:
+  - name: SSH Service - Install/Update apt package
+    apt:
+      name: openssh-server
+
+  - name: SSH Service - Create configuration from template
+    template:
+      src: etc/ssh/sshd_config
+      dest: /etc/ssh/sshd_config
+      owner: root
+      group: root
+      mode: 0600
+    notify: SSH Restart
+
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+
+
+- name: SSHD Service - Install, Configure, Restart (RHEL)
+  block:
+  - name: SSHD - Install/Update apt package
+    yum:
+      name: openssh-server
+
+  - name: SSHD Service - Create configuration from template
+    template:
+      src: etc/ssh/sshd_config
+      dest: /etc/ssh/sshd_config
+      owner: root
+      group: root
+      mode: 0600
+    notify: SSHD Restart
+
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"

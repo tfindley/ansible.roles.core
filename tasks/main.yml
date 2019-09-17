@@ -1,0 +1,25 @@
+---
+# tasks file for core::main
+
+- name: Gather facts from new server
+  setup:
+    filter: ansible_default_ipv4.address
+
+- debug:
+    msg: "System name '{{ inventory_hostname }}' has IP '{{ ansible_default_ipv4.address }}' running OS '{{ ansible_distribution }}'"
+
+- name: Run main tasks for DEB only
+  block:
+  - include_tasks: deb/apt_config.yml
+  - include_tasks: deb/apt_install.yml
+  when: ansible_os_family == "Debian"
+
+
+- name: Run main tasks for RHEL only
+  block:
+  - include_tasks: rhel/yum_config.yml
+  - include_tasks: rhel/yum_install.yml
+  - include_tasks: rhel/selinux.yml
+  when: ansible_os_family == "RedHat"
+
+- include_tasks: ssh.yml
