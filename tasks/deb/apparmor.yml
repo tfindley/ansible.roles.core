@@ -1,15 +1,16 @@
-# tasks file for core::rhel/selinux
-
-- name: Disable SELinux
-  selinux:
-    state: disabled
-  register: selinux_mode
+- name: Disable AppArmor
+  service:
+    name: apparmor
+    state: stopped
+    enabled: no
+  register: apparmor_mode
+  when: ansible_apparmor.status == "enabled"
 
 - name: Reboot immediately if there was a change.
   shell: "sleep 5 && reboot"
   async: 1
   poll: 0
-  when: selinux_mode is changed
+  when: apparmor_mode is changed
 
 - name: Wait for the reboot to complete if there was a change.
   wait_for_connection:
@@ -17,4 +18,6 @@
     sleep: 10
     delay: 5
     timeout: 300
-  when: selinux_mode is changed
+  when: apparmor_mode is changed
+
+

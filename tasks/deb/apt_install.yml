@@ -1,9 +1,12 @@
 # tasks file for core::apt_install
 
-- name: Install a list of Ansibe-required packages
-  apt:
+- name: Install a list of required packages
+  yum:
     name: "{{ packages }}"
   vars:
     packages:
-    - python-apt
-    - libcurl3
+    - rsync
+    - screen
+    - tree
+    - vim
+    - nano

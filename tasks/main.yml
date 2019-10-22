@@ -6,12 +6,13 @@
     filter: ansible_default_ipv4.address
 
 - debug:
-    msg: "System name '{{ inventory_hostname }}' has IP '{{ ansible_default_ipv4.address }}' running OS '{{ ansible_distribution }}'"
+    msg: "System {{ inventory_hostname }} ({{ ansible_default_ipv4.address }}) running {{ ansible_distribution }} {{ ansible_distribution_major_version }} ({{ ansible_distribution_release }})"
 
 - name: Run main tasks for DEB only
   block:
   - include_tasks: deb/apt_config.yml
   - include_tasks: deb/apt_install.yml
+  - include_tasks: deb/apparmor.yml
   when: ansible_os_family == "Debian"
 
 

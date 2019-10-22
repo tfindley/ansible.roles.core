@@ -1,22 +1,14 @@
 # tasks file for core::rhel/yum_install
 
-- name: Install a list of ansible-required packages
-  yum:
-    name: "{{ packages }}"
-  vars:
-    packages:
-    - epel-release
-    - libselinux-python
-    - wget
-    - curl
-    - tar
-
 - name: Install a list of required packages
   yum:
     name: "{{ packages }}"
   vars:
     packages:
-    - which
+    - rsync
     - net-tools
+    - which
     - tree
     - screen
+    - vim
+    - nano

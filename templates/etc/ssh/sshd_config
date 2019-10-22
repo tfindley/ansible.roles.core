@@ -1,12 +1,12 @@
-# This file is {{ ansible_managed }}.
-# Last Pushed on {{ ansible_date_time.date }}
-#
-#       $OpenBSD: sshd_config,v 1.100 2016/08/15 12:32:04 naddy Exp $
+#   This file is {{ ansible_managed }}.
+#	$OpenBSD: sshd_config,v 1.100 2016/08/15 12:32:04 naddy Exp $
 
 # This is the sshd server system-wide configuration file.  See
 # sshd_config(5) for more information.
 
-# This sshd was compiled with PATH=/usr/local/bin:/usr/bin
+{% if ansible_os_family == "RedHat" %}# This sshd was compiled with PATH=/usr/local/bin:/usr/bin{% endif %}
+{% if ansible_os_family == "Debian" %}# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin{% endif %}
+
 
 # The strategy used for options in the default sshd_config shipped with
 # OpenSSH is to specify options with their default value where
@@ -22,10 +22,11 @@
 
 #Port 22
 #AddressFamily any
-#ListenAddress {{ ansible_default_ipv4.address }}
+#ListenAddress 0.0.0.0
 #ListenAddress ::
 
 HostKey /etc/ssh/ssh_host_rsa_key
+# HostKey /etc/ssh/ssh_host_dsa_key - DSA compromised: Do not use!
 HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
@@ -40,7 +41,7 @@ SyslogFacility AUTHPRIV
 # Authentication:
 
 #LoginGraceTime 2m
-#PermitRootLogin no
+PermitRootLogin no
 #StrictModes yes
 #MaxAuthTries 6
 #MaxSessions 10
@@ -71,6 +72,8 @@ PasswordAuthentication no
 
 # Change to yes to enable challenge-response passwords (beware issues with
 # some PAM modules and threads)
+# Change to no to disable s/key passwords
+#ChallengeResponseAuthentication yes
 ChallengeResponseAuthentication no
 
 # Kerberos options
@@ -81,8 +84,14 @@ ChallengeResponseAuthentication no
 #KerberosUseKuserok yes
 
 # GSSAPI options
+{% if ansible_os_family == "RedHat" %}
 GSSAPIAuthentication yes
 GSSAPICleanupCredentials no
+{% endif %}
+{% if ansible_os_family == "Debian" %}
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+{% endif %}
 #GSSAPIStrictAcceptorCheck yes
 #GSSAPIKeyExchange no
 #GSSAPIEnablek5users no
@@ -96,18 +105,28 @@ GSSAPICleanupCredentials no
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
-# WARNING: 'UsePAM no' is not supported in Red Hat Enterprise Linux and may cause several
+
+# WARNING: 'UsePAM no' is not supported in Red Hat Enterprise Linux / Fedora and may cause several
 # problems.
+{% if ansible_distribution == "RedHat" or ansible_distribution == "Fedora" %}
 UsePAM yes
+{% else %}
+UsePAM yes
+{% endif %}
+
 
 #AllowAgentForwarding yes
 #AllowTcpForwarding yes
 #GatewayPorts no
-X11Forwarding no
+X11Forwarding yes
 #X11DisplayOffset 10
 #X11UseLocalhost yes
 #PermitTTY yes
-#PrintMotd yes
+
+# It is recommended to use pam_motd in /etc/pam.d/sshd instead of PrintMotd,
+# as it is more configurable and versatile than the built-in version.
+PrintMotd no
+
 #PrintLastLog yes
 #TCPKeepAlive yes
 #UseLogin no
@@ -117,7 +136,7 @@ X11Forwarding no
 #ClientAliveInterval 0
 #ClientAliveCountMax 3
 #ShowPatchLevel no
-#UseDNS yes
+#UseDNS no
 #PidFile /var/run/sshd.pid
 #MaxStartups 10:30:100
 #PermitTunnel no
@@ -128,25 +147,26 @@ X11Forwarding no
 #Banner none
 
 {% if ansible_os_family == "RedHat" %}
-# Accept locale-related environment variables
+# Accept locale-related environment variables - RedHat
 AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
 AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
 AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
 AcceptEnv XMODIFIERS
 {% endif %}
 
-# override default of no subsystems
-{% if ansible_os_family == "RedHat" %}
-Subsystem sftp  /usr/libexec/openssh/sftp-server
-{% endif %}
 {% if ansible_os_family == "Debian" %}
-Subsystem	sftp	/usr/lib/openssh/sftp-server
+# Allow client to pass locale environment variables - Debian
+AcceptEnv LANG LC_*
 {% endif %}
+
+# override default of no subsystems
+{% if ansible_os_family == "RedHat" %}Subsystem	sftp	/usr/libexec/openssh/sftp-server{% endif %}
+{% if ansible_os_family == "Debian" %}Subsystem	sftp	/usr/lib/openssh/sftp-server{% endif %}
 
 
 # Example of overriding settings on a per-user basis
 #Match User anoncvs
-#       X11Forwarding no
-#       AllowTcpForwarding no
-#       PermitTTY no
-#       ForceCommand cvs server
+#	X11Forwarding no
+#	AllowTcpForwarding no
+#	PermitTTY no
+#	ForceCommand cvs server
