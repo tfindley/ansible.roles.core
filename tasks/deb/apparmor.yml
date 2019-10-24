@@ -6,11 +6,18 @@
   register: apparmor_mode
   when: ansible_apparmor.status == "enabled"
 
-- name: Reboot immediately if there was a change.
-  shell: "sleep 5 && reboot"
-  async: 1
-  poll: 0
+- name: Reboot machine following AppArmor state change
+  reboot:
+    pre_reboot_delay: 5
+    post_reboot_delay: 15
+    msg: "Reboot initiated by Ansible::Core"
   when: apparmor_mode is changed
+
+# - name: Reboot immediately if there was a change.
+#   shell: "sleep 5 && reboot"
+#   async: 1
+#   poll: 0
+#   when: apparmor_mode is changed
 
 - name: Wait for the reboot to complete if there was a change.
   wait_for_connection:
