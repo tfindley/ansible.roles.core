@@ -1,0 +1,6 @@
+package_install:
+- rsync
+- screen
+- tree
+- vim
+- nano

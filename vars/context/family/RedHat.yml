@@ -1,0 +1,8 @@
+package_install:
+- rsync
+- net-tools
+- which
+- tree
+- screen
+- vim
+- nano

@@ -1,0 +1,11 @@
+ppa_desktop_add:
+- ppa:ansible/ansible
+
+package_desktop_remove:
+- ubuntu-web-launchers
+
+package_desktop_install:
+- terminator
+- vlc
+- ansible
+
