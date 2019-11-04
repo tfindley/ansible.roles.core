@@ -1,1 +1,18 @@
 # tasks file for core::apt_config
+
+- name: Install apt repo PPA
+  apt_repository:
+    repo: "{{item}}"
+  with_items: ppa_desktop_add
+  when: desktop == True
+
+# - name: Install apt repos and keys
+#   block:
+  
+#   - name: Install repo {{item.name}}
+#     apt_repository:
+#       repo: "{{item.repo}}"
+#       filename: "{{item.filename}}"
+
+#   with_item: apt_desktop_add
+#   when: desktop == True

@@ -2,3 +2,5 @@
 # defaults file for core
 zabbix_server: 172.16.0.3
 zabbix_key: jeTho2l9Or1Wref3ITlPhODr7dl9980pET39f6IFUylfREs68bAzu4HoP4Gobrin
+
+desktop: False

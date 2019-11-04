@@ -71,11 +71,30 @@
   - include_tasks: rhel/selinux.yml
   when: ansible_os_family == "RedHat"
 
+- include_tasks: deb/apt_config.yml
+  when: ansible_os_family == "Debian"
+
 - name: Install packages
   package:
     name: "{{item}}"
     state: present
   with_items: "{{package_install}}"
   ignore_errors: True
+
+- name: Install desktop packages
+  package:
+    name: "{{item}}"
+    state: present
+  with_items: "{{package_desktop_install}}"
+  ignore_errors: True
+  when: desktop == True
+
+- name: Remove desktop packages
+  package:
+    name: "{{item}}"
+    state: absent
+  with_items: "{{package_desktop_remove}}"
+  ignore_errors: true
+  when: desktop == True
 
 - include_tasks: ssh.yml
