@@ -24,3 +24,8 @@
     name: sshd
     state: restarted
     enabled: yes
+
+- name: yum-clean-metadata
+  command: yum clean metadata
+  args:
+    warn: no

@@ -69,6 +69,8 @@
 - name: Run main tasks for RHEL only
   block:
   - include_tasks: rhel/selinux.yml
+  - include_tasks: rhel/yum_config.yml
+    when: (local_repo is defined and local_repo == True and (ansible_default_ipv4.address != local_repo or inventory_hostname not in groups['repo']))
   when: ansible_os_family == "RedHat"
 
 - name: Install packages

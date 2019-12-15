@@ -1,1 +1,25 @@
 # tasks file for core::rhel/yum_config
+
+- name: Remove base repository (and clean up left-over metadata)
+  yum_repository:
+    name: base
+    state: absent
+  notify: yum-clean-metadata
+
+- name: Remove updates repository (and clean up left-over metadata)
+  yum_repository:
+    name: updates
+    state: absent
+  notify: yum-clean-metadata
+
+  - name: Remove extras repository (and clean up left-over metadata)
+  yum_repository:
+    name: extras
+    state: absent
+  notify: yum-clean-metadata
+
+    - name: Remove centosplus repository (and clean up left-over metadata)
+  yum_repository:
+    name: centosplus
+    state: absent
+  notify: yum-clean-metadata

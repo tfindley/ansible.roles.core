@@ -1,5 +1,5 @@
 # tasks file for core::rhel/yum_install
-
+# obsoleted in favour of new configuration method
 - name: Install a list of required packages
   yum:
     name: "{{ packages }}"
