@@ -1,13 +1,13 @@
 ---
 # tasks file for core::ssh
 
-  - name: SSH Service - Install/Update package
+  - name: Core.SSH - Install/Update OpenSSH
     package:
       name: openssh-server
 
-  - name: SSH Service - Create configuration from template
+  - name: Core.SSH - Create configuration from template
     template:
-      src: etc/ssh/sshd_config
+      src: etc/ssh/sshd_config.j2
       dest: /etc/ssh/sshd_config
       owner: root
       group: root

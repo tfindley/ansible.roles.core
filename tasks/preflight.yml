@@ -1,0 +1,13 @@
+# - name: Ansible-Prep.PreFlight - Add EPEL Release
+#   yum:
+#     name: epel-release
+#   when:
+#     - ansible_os_family == "RedHat"
+#     - local_repos
+
+- name: Core.PreFlight - Install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ package_install }}"
+  ignore_errors: True

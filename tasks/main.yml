@@ -1,12 +1,14 @@
 ---
 # tasks file for core::main
 
-- name: Gather facts from new server
+- name: Core.Main - Gather facts from new server
   setup:
     filter: ansible_default_ipv4.address
 
 - debug:
-    msg: "System {{ inventory_hostname }} ({{ ansible_default_ipv4.address }}) running {{ ansible_distribution }} {{ ansible_distribution_major_version }} ({{ ansible_distribution_release }})"
+    msg:
+      - "System {{ inventory_hostname }} ({{ ansible_default_ipv4.address }})"
+      - "running {{ ansible_distribution }} {{ ansible_distribution_major_version }} ({{ ansible_distribution_release }})"
 
 
 
@@ -19,22 +21,18 @@
 #  - Distribution (i.e: RedHat Enterprise, CentOS, Ubuntu)
 #  - LSB name (i.e: Raspbian) - only applicable to Debian-based OS's, and primarily needed to support Raspbian on Raspberry Pi's as its the only place Raspbian is specified
 #  - Distribution-Version (i.e: Debian-10)
-#  - Hostname (as specificed in inventory file)
-#  - Hostname (as read by Ansible)
-#  - IP Address
 
 # Remember these are CASE SENSITIVE
 
-
 # This deals with family-specific variabiles. Store them in /var/family/___.yml
-- name: Load OS family specific variables file
+- name: Core.Main - Load OS family specific variables file
   include_vars:
-    file: "context/family/{{ansible_os_family}}.yml" # RedHat.yml
+    file: "context/family/{{ ansible_os_family }}.yml" # RedHat.yml
   ignore_errors: true
 
 
 # This deals with os-specific variabiles. Store them in /var/os/___.yml
-- name: Load os specific variables file
+- name: Core.Main - Load os specific variables file
   include_vars: "{{ item }}"
   with_first_found:
     - "context/os/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml" # Debian-10.yml
@@ -44,7 +42,7 @@
 
 
 # This deals with host-specific variabiles. Store them in /var/host/___.yml
-- name: Load host specific variables file
+- name: Core.Main - Load host specific variables file
   include_vars: "{{ item }}"
   with_first_found:
     - "context/host/{{ ansible_default_ipv4.address }}.yml" # 10.0.0.10.yml
@@ -59,23 +57,18 @@
 #   - Variables do not concatonate. You must specify the whole variable again.
 # -------
 
+- name: Core.Main - Handing off to PreFlight task
+  include_tasks: preflight.yml
 
-- name: Run main tasks for DEB only
-  block:
-  - include_tasks: deb/apparmor.yml
+- name: Core.Main - Handing off to SSH Configuration task
+  include_tasks: ssh.yml
+
+- name: Core.Main - Handing off to AppArmor Configuration task
+  include_tasks: apparmor.yml
   when: ansible_os_family == "Debian"
 
-
-- name: Run main tasks for RHEL only
-  block:
-  - include_tasks: rhel/selinux.yml
-  when: ansible_os_family == "RedHat"
-
-- name: Install packages
-  package:
-    name: "{{item}}"
-    state: present
-  with_items: "{{package_install}}"
-  ignore_errors: True
-
-- include_tasks: ssh.yml
+- name: Core.Main - Handing off to SELinux Configuration task
+  include_tasks: selinux.yml
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_selinux.status == 'enabled'

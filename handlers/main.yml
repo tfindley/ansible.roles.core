@@ -1,24 +1,6 @@
 ---
 # handlers file for rpsetup
 
-- name: BIND Restart
-  service:
-    name: bind9
-    state: restarted
-  when: inventory_hostname in groups['bind']
-
-- name: DHCP Restart
-  service:
-    name: isc-dhcp-server
-    state: restarted
-  when: inventory_hostname in groups['dhcpd']
-
-- name: Chrony Restart
-  service:
-    name: chrony
-    state: restarted
-  when: inventory_hostname in groups['chrony']
-
 - name: SSHD Restart
   service:
     name: sshd
